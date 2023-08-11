@@ -16,7 +16,8 @@ class Sprite {
     constructor({position, velocity}){
         this.position = position;
         this.velocity = velocity;
-        this.height = 150
+        this.height = 150;
+        this.lasKey
 
     }
 
@@ -27,7 +28,9 @@ class Sprite {
 
     update(){
         this.draw()
-        this.position.y = this.position.y += this.velocity.y
+
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
 
 
         //making the player stop at the bottom of the canvas
@@ -73,6 +76,27 @@ const enemy = new Sprite({
    }
 });
 
+//meovement keys
+const keys = {
+    a: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+    w:{
+        pressed: false
+    },
+    ArrowRight:{
+        pressed: false
+    },
+    ArrowLeft: {
+        pressed: false
+    }
+
+
+}
+
 
 
 //creating animation class to animate players
@@ -85,6 +109,106 @@ function animate(){
     player.update();
     enemy.update();
     // console.log('go')
+
+    player.velocity.x = 0;
+    //player movements
+    if(keys.a.pressed && player.lasKey === 'a'){
+        player.velocity.x = -3;
+    }else if (keys.d.pressed && player.lasKey === 'd'){
+        player.velocity.x = 3;
+    }
+
+    enemy.velocity.x = 0;
+    //enemy movements
+    if(keys.ArrowLeft.pressed && enemy.lasKey === 'ArrowLeft'){
+        enemy.velocity.x = -3;
+    }else if (keys.ArrowRight.pressed && enemy.lasKey === 'ArrowRight'){
+        enemy.velocity.x = 3;
+    }
 }
 
 animate();
+
+
+//when key is pressed
+window.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        //player movement
+        //moving player right
+        case 'd':
+            keys.d.pressed = true;
+            player.lasKey = 'd';
+        break;
+
+        //moving player left
+        case 'a':
+            keys.a.pressed = true;
+            player.lasKey = 'a';
+        break;
+        
+        //jumping
+        case 'w':
+            player.velocity.y = -10
+        break;
+
+
+        //enemy movement
+        //moving enemy right
+        case 'ArrowRight':
+            keys.ArrowRight.pressed = true;
+            enemy.lasKey = 'ArrowRight';
+        break;
+
+        //moving enemy left
+        case 'ArrowLeft':
+            keys.ArrowLeft.pressed = true;
+            enemy.lasKey = 'ArrowLeft';
+        break;
+        
+        //jumping
+        case 'ArrowUp':
+            enemy.velocity.y = -10
+        break;
+    }
+    console.log(event.key);
+})
+
+//when key is relased after pressing
+window.addEventListener('keyup', (event) => {
+    switch (event.key) {
+        //player movements
+        //stopping moving player right
+        case 'd':
+            keys.d.pressed = false;
+        break;
+
+        //stopping from moving player left
+        case 'a':
+            keys.a.pressed = false;
+        break;
+
+        //stopping from  player jumping
+        case 'w':
+            keys.w.pressed = false;
+        break;
+
+    }
+
+
+    switch(event.key){
+        //enemy movements
+        //stopping moving enemy right
+        case 'ArrowRight':
+            keys.ArrowRight.pressed = false;
+        break;
+
+        //stopping from moving enemy left
+        case 'ArrowLeft':
+            keys.ArrowLeft.pressed = false;
+        break;
+    }
+        
+    
+    console.log(event.key);
+})
+
