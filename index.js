@@ -1,3 +1,5 @@
+//57.53
+
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
@@ -9,21 +11,36 @@ canvas.height = 576;
 c.fillRect(0,0, canvas.width, canvas.height);
 
 
-const gravity = 0.2
+const gravity = 0.7
 
 //creating players
 class Sprite {
-    constructor({position, velocity}){
+    constructor({position, velocity, color = 'red'}){
         this.position = position;
         this.velocity = velocity;
+        this.width = 50
         this.height = 150;
         this.lasKey
+        this.attackBox = {
+            position:this.position ,
+            width: 100 ,
+            height: 50,
+        }
+        this.color = color
 
     }
 
     draw(){
-        c.fillStyle = 'red';
-        c.fillRect(this.position.x, this.position.y,50, this.height)
+        c.fillStyle = this.color;
+        c.fillRect(this.position.x, this.position.y,this.width, this.height)
+
+        //atackboc draw
+        c.fillStyle = 'green';
+        c.fillRect(
+            this.attackBox.position.x,
+            this.attackBox.position.y, 
+            this.attackBox.width, 
+            this.attackBox.height)
     }
 
     update(){
@@ -73,7 +90,8 @@ const enemy = new Sprite({
    velocity:{
        x:0,
        y:0
-   }
+   },
+   color: 'blue'
 });
 
 //meovement keys
@@ -113,17 +131,24 @@ function animate(){
     player.velocity.x = 0;
     //player movements
     if(keys.a.pressed && player.lasKey === 'a'){
-        player.velocity.x = -3;
+        player.velocity.x = -7;
     }else if (keys.d.pressed && player.lasKey === 'd'){
-        player.velocity.x = 3;
+        player.velocity.x = 7;
     }
 
     enemy.velocity.x = 0;
     //enemy movements
     if(keys.ArrowLeft.pressed && enemy.lasKey === 'ArrowLeft'){
-        enemy.velocity.x = -3;
+        enemy.velocity.x = -7;
     }else if (keys.ArrowRight.pressed && enemy.lasKey === 'ArrowRight'){
-        enemy.velocity.x = 3;
+        enemy.velocity.x = 7;
+    }
+
+
+    //detect collisions 
+    if(player.attackBox.position.x + player.attackBox.width >= enemy.position.x && player.attackBox.position.x <= enemy.position.x + enemy.width){
+        console.log('enemy')
+
     }
 }
 
@@ -148,7 +173,7 @@ window.addEventListener('keydown', (event) => {
         
         //jumping
         case 'w':
-            player.velocity.y = -10
+            player.velocity.y = -18
         break;
 
 
@@ -167,7 +192,7 @@ window.addEventListener('keydown', (event) => {
         
         //jumping
         case 'ArrowUp':
-            enemy.velocity.y = -10
+            enemy.velocity.y = -18
         break;
     }
     console.log(event.key);
