@@ -15,18 +15,23 @@ const gravity = 0.7
 
 //creating players
 class Sprite {
-    constructor({position, velocity, color = 'red'}){
+    constructor({position, velocity, color = 'red', offset}){
         this.position = position;
         this.velocity = velocity;
         this.width = 50
         this.height = 150;
         this.lasKey
         this.attackBox = {
-            position:this.position ,
+            position:{
+                x: this.position.x,
+                y: this.position.y
+            } ,
+            offset,
             width: 100 ,
             height: 50,
         }
         this.color = color
+        this.isAttacking
 
     }
 
@@ -35,16 +40,20 @@ class Sprite {
         c.fillRect(this.position.x, this.position.y,this.width, this.height)
 
         //atackboc draw
-        c.fillStyle = 'green';
-        c.fillRect(
-            this.attackBox.position.x,
-            this.attackBox.position.y, 
-            this.attackBox.width, 
-            this.attackBox.height)
+        if(this.isAttacking) {
+            c.fillStyle = 'green';
+            c.fillRect(
+                this.attackBox.position.x,
+                this.attackBox.position.y, 
+                this.attackBox.width, 
+                this.attackBox.height)
+        }
     }
 
     update(){
         this.draw()
+        this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
+        this.attackBox.position.y = this.position.y
 
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
@@ -60,6 +69,15 @@ class Sprite {
 
         }
     }
+
+
+    //making the attaack stop after 100ms
+    attack(){
+        this.isAttacking = true;
+        setTimeout(() =>{
+            this.isAttacking = false;
+        }, 100)
+    }
 }
 
 
@@ -74,6 +92,10 @@ const player = new Sprite({
     velocity:{
         x:0,
         y:10
+    },
+    offset:{
+        x: 0,
+        y:0
     }
 });
 
@@ -91,7 +113,11 @@ const enemy = new Sprite({
        x:0,
        y:0
    },
-   color: 'blue'
+   color: 'blue',
+   offset:{
+    x: -50,
+    y:0
+    }
 });
 
 //meovement keys
@@ -113,6 +139,20 @@ const keys = {
     }
 
 
+}
+
+
+//function to detect collision
+function rectangularCollision({
+    recangle1, recatangle2
+
+}){
+    return(
+        recangle1.attackBox.position.x + recangle1.attackBox.width >= recatangle2.position.x && 
+        recangle1.attackBox.position.x <= recatangle2.position.x + recatangle2.width &&
+        recangle1.attackBox.position.y + recangle1.attackBox.height >= recatangle2.position.y
+        && recangle1.attackBox.position.y <= recatangle2.position.y + recatangle2.height
+    )
 }
 
 
@@ -145,9 +185,23 @@ function animate(){
     }
 
 
-    //detect collisions 
-    if(player.attackBox.position.x + player.attackBox.width >= enemy.position.x && player.attackBox.position.x <= enemy.position.x + enemy.width){
-        console.log('enemy')
+    //detect collisions player
+    if(rectangularCollision({
+        recangle1:player,
+        recatangle2:enemy
+    }) && player.isAttacking){
+            player.isAttacking = false;
+        console.log('player attack')
+
+    }
+
+    //detect collision of enemy
+    if(rectangularCollision({
+        recangle1:enemy,
+        recatangle2:player
+    }) && enemy.isAttacking){
+            enemy.isAttacking = false;
+        console.log('enemy attack')
 
     }
 }
@@ -163,18 +217,22 @@ window.addEventListener('keydown', (event) => {
         case 'd':
             keys.d.pressed = true;
             player.lasKey = 'd';
-        break;
+            break;
 
         //moving player left
         case 'a':
             keys.a.pressed = true;
             player.lasKey = 'a';
-        break;
+            break;
         
         //jumping
         case 'w':
             player.velocity.y = -18
-        break;
+            break;
+        //attacking
+        case ' ':
+            player.attack()
+            break;
 
 
         //enemy movement
@@ -182,20 +240,25 @@ window.addEventListener('keydown', (event) => {
         case 'ArrowRight':
             keys.ArrowRight.pressed = true;
             enemy.lasKey = 'ArrowRight';
-        break;
+            break;
 
         //moving enemy left
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true;
             enemy.lasKey = 'ArrowLeft';
-        break;
+            break;
         
         //jumping
         case 'ArrowUp':
             enemy.velocity.y = -18
-        break;
+            break;
+
+        //attacking enemy
+        case 'ArrowDown':
+            enemy.isAttacking = true;
+            break;
     }
-    console.log(event.key);
+    // console.log(event.key);
 })
 
 //when key is relased after pressing
@@ -234,6 +297,6 @@ window.addEventListener('keyup', (event) => {
     }
         
     
-    console.log(event.key);
+    // console.log(event.key);
 })
 
