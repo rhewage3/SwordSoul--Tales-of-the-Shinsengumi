@@ -7,7 +7,20 @@
     <link rel="icon" type="image/svg+xml" href="assets/main.jpg">
 </head>
 <body>
-   <canvas></canvas>
+    <!-- red container div -->
+    <div style="position: relative;">
+        <!-- smaller red container div -->
+        <div style="position: absolute; display: flex; width: 100%;">
+            <!-- player health -->
+            <div style="background-color: yellow; height: 30px; width: 100%;"></div>
+            <!-- timer -->
+            <div style="background-color: red; width: 100px; height: 100px; flex-shrink:0;"></div>
+            <!-- enemy health -->
+            <div style="background-color: yellow; height: 30px; width: 100%;"></div>
+        </div>
+        <canvas></canvas>
+    </div>
+   
     
 
    <script src="index.js"></script>
